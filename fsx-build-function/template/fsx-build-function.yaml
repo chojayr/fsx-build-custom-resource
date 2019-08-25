@@ -1,0 +1,123 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: AWS CloudFormation template to deploy custom-resource FSx with SelfManagedActiveDirectory support
+Parameters:
+  S3BucketName:
+    Description: S3 bucket that contain the lambda zip package.
+    Type: String
+  S3BucketKey:
+    Description: S3 Key for lambda zip package.
+    Type: String
+  AppPrefix:
+    Description: Application Name prefix that will use for the prefix of the resource name.
+    Type: String
+  Handler:
+    Description: The handler function.
+    Type: String
+    Default: fsx-build.handler
+
+Resources:
+
+  FSxLambdaCustomResourceRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub
+        - ${AppName}-fsx-build-custom-resource-iam-role
+        - { AppName: !Ref AppPrefix }
+
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+                - events.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+
+
+  FSxLambdaCustomResourcePolicy:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: !Sub
+        - ${AppName}-fsx-build-custom-resource-iam-policy
+        - { AppName: !Ref AppPrefix }
+      Roles:
+        - !Ref FSxLambdaCustomResourceRole
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'fsx:*'
+              - kms:CreateGrant
+              - kms:DescribeKey
+              - elasticfilesystem:CreateMountTarget
+              - ec2:DescribeNetworkInterfaces
+              - ec2:DescribeSubnets
+              - ec2:CreateNetworkInterface
+            Resource: '*'
+          - Effect: Allow
+            Resource: '*'
+            Action:
+              - iam:CreateServiceLinkedRole*
+            Condition:
+              StringLike:
+                'iam:AWSServiceName': 'fsx.amazonaws.com'
+          - Effect: Allow
+            Action:
+              - lambda:AddPermission
+              - lambda:RemovePermission
+              - events:PutRule
+              - events:DeleteRule
+              - events:PutTargets
+              - events:RemoveTargets
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - 'logs:CreateLogGroup'
+              - 'logs:CreateLogStream'
+              - 'logs:PutLogEvents'
+              - 'logs:DescribeLogStreams'
+            Resource:
+              - 'arn:aws:logs:*:*:*'
+
+  FSxCustomResourceLambda:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Description: 'Lambda Function for the FSx custom resource'
+      Code:
+        S3Bucket: !Ref S3BucketName
+        S3Key: !Ref S3BucketKey
+      Role: !GetAtt FSxLambdaCustomResourceRole.Arn
+      Timeout: 240
+      FunctionName: !Sub 
+        - ${AppName}-fsx-build-custom-resource-function
+        - { AppName: !Ref AppPrefix }
+      Handler: !Ref Handler
+      Runtime: python3.7
+      MemorySize: 256
+    DependsOn:
+      - FSxLambdaCustomResourcePolicy
+
+  FSxLambdaCustomResourceLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      LogGroupName: !Sub
+        - /aws/lambda/${Function}
+        - { Function: !Ref FSxCustomResourceLambda }
+      RetentionInDays: 3
+    DeletionPolicy: Delete
+    DependsOn: FSxCustomResourceLambda
+
+
+Outputs:
+
+  FSxCustomResourceFunctionArn:
+    Description: Lambda function ARN for the FSx Custom Resource
+    Value: !GetAtt
+      - FSxCustomResourceLambda
+      - Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-fsx-build-function

@@ -1,0 +1,98 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: AWS FSx Resource with SelfManagedActiveDirectory support
+Parameters:
+  FSxBuildFunctionStackName: 
+    Description: fsx-build-function stack name.
+    Type: String
+  FSxShareName:
+    Description: FSx FileSystem Name.
+    Type: String
+  StorageCapacity:
+    Description: FSx Storage Capacity.
+    Type: Number
+  Subnet:
+    Description: Subnet use by the FSx.
+    Type: String
+  SG1:
+    Description: Application security group 1.
+    Type: String
+  SG2:
+    Description: Application security group 2.
+    Type: String
+  SG3:
+    Description: Application security group 3.
+    Type: String
+  AppPrefix:
+    Description: Application Name use for resource prefix.
+    Type: String
+  Team:
+    Description: Team tags.
+    Type: String
+  Service:
+    Description: Service tags.
+    Type: String
+  KmsKey:
+    Description: KMS key to encrypt FSx.
+    Type: String
+  Domain:
+    Description: Domain Name
+    Type: String
+  AdminGroup:
+    Description: Domain Admin Group
+    Type: String
+  OU:
+    Description: Domain Org Unit
+    Type: String
+  UserName:
+    Description: Domain User Name
+    Type: String
+  Password:
+    Description: Encrypted Domain User Password
+    Type: String
+    NoEcho: true
+  DNSip1:
+    Description: DNS IP 1
+    Type: String
+  DNSip2:
+    Description: DNS IP 2
+    Type: String
+  Throughput:
+    Description: FSx Throughput 
+    Type: Number
+
+Resources:
+
+  FSxShareStorage:
+    Type: 'Custom::FSxShareStorage'
+    Version: 1.0
+    Properties:
+      ServiceToken:
+        Fn::ImportValue:
+          !Sub ${FSxBuildFunctionStackName}-fsx-build-function
+      StorageCapacity: !Ref StorageCapacity
+      FSName: !Sub 
+        - ${AppName}-fsx-${FSxName}
+        - { AppName: !Ref AppPrefix, FSxName: !Ref FSxShareName }
+      SubnetId: !Ref Subnet
+      SecurityGroupId1: !Ref SG1
+      SecurityGroupId2: !Ref SG2
+      SecurityGroupId3: !Ref SG3
+      Team: !Ref Team
+      Service: !Ref Service
+      KmsKey: !Ref KmsKey
+      DomainName: !Ref Domain
+      FSAdminGroup: !Ref AdminGroup
+      OrganizationalUnitName: !Ref OU
+      UserName: !Ref UserName
+      Password: !Ref Password
+      DNSIp1: !Ref DNSip1
+      DNSIp2: !Ref DNSip2
+      ThroughputCapacity: !Ref Throughput
+
+Outputs:
+  FSxCustomStackName:
+    Value: !Ref 'AWS::StackName'
+
+  FSxFileSystemId:
+    Value: !Ref FSxShareStorage
+

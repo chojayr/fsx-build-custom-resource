@@ -1,0 +1,78 @@
+[
+    {
+        "ParameterKey": "FSxBuildFunctionStackName",
+        "ParameterValue": "<stack name of the deployed fsx-build-function>"
+    },
+    {
+        "ParameterKey": "FSxShareName",
+        "ParameterValue": "<fsx-share-volume-name>"
+    },
+    {
+        "ParameterKey": "StorageCapacity",
+        "ParameterValue": "300"
+    },
+    {
+        "ParameterKey": "Subnet",
+        "ParameterValue": "<your subnet id>"
+    },
+    {
+        "ParameterKey": "SG1",
+        "ParameterValue": "<security group1>"
+    },
+    {
+        "ParameterKey": "SG2",
+        "ParameterValue": "<security group2>"
+    },
+    {
+        "ParameterKey": "SG3",
+        "ParameterValue": "<security group3>"
+    },
+    {
+        "ParameterKey": "AppPrefix",
+        "ParameterValue": "<name that will be use as prefix to your fsx share"
+    },
+    {
+        "ParameterKey": "Team",
+        "ParameterValue": "<your team name for tagging purposes>"
+    },
+    {
+        "ParameterKey": "Service",
+        "ParameterValue": "<service name for tagging purposes>"
+    },
+    {
+        "ParameterKey": "KmsKey",
+        "ParameterValue": "<kms key id>"
+    },
+    {
+        "ParameterKey": "Domain",
+        "ParameterValue": "<fully qualified domain name of the self-managed AD>"
+    },
+    {
+        "ParameterKey": "OU",
+        "ParameterValue": "<fully qualified distinguished name of the organizational unit within your self-managed AD>"
+    },
+    {
+        "ParameterKey": "AdminGroup",
+        "ParameterValue": "<name of the domain group whose members are granted administrative privileges>"
+    },
+    {
+        "ParameterKey": "UserName",
+        "ParameterValue": "<user name for the service account on your self-managed AD>"
+    },
+    {
+        "ParameterKey": "Password",
+        "ParameterValue": "<password for the service account on your self-managed AD that has been encrypted by the encrypt_value.py script>"
+    },
+    {
+        "ParameterKey": "DNSip1",
+        "ParameterValue": "<DNS server 1>"
+    },
+    {
+        "ParameterKey": "DNSip2",
+        "ParameterValue": "<DNS server 2>"
+    },
+    {
+        "ParameterKey": "Throughput",
+        "ParameterValue": "8"
+    }
+] 

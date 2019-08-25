@@ -1,0 +1,19 @@
+[
+    {
+        "ParameterKey": "S3BucketName",
+        "ParameterValue": "<your s3 bucket>"
+    },
+    {
+        "ParameterKey": "S3BucketKey",
+        "ParameterValue": "<location/of/your/fsx-build-lambda.zip>"
+    },
+    {
+        "ParameterKey": "AppPrefix", 
+        "ParameterValue": "<name that will be use as a prefix for the created resources>"
+    },
+    {
+        "ParameterKey": "Handler",
+        "ParameterValue": "fsx-build.handler"
+    }
+]
+
